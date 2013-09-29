@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" >
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Pin Examples</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+	<meta name="author" content="@benjaminbenben">
+
+	<!-- mini-modernizr -->
+	<script type="text/javascript">document.getElementsByTagName('html')[0].className = 'js';</script>
+
+</head>
+<body>
+	<div class="jumbotron">
+		<div class="container">
+			<h1>pin <small>connect devices with webrtc</small></h1>
+			<div id="action">
+				<button class="btn btn-lg btn-primary disabled" data-toggle="modal" href="#create">Create code</button>
+				<button class="btn btn-lg btn-success disabled" data-toggle="modal" href="#enter">Enter code</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+
+	<div class="modal fade" id="create" >
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Create Code</h4>
+				</div>
+				<div class="modal-body">
+					<h1 id="pin-code"></h1>
+					<p>Visit this page with another device and choose <span class="btn btn-success">Enter Code</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade" id="enter" >
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Enter Code</h4>
+				</div>
+				<div class="modal-body">
+					<input class="form-control input-lg" placeholder="pin code" pattern="[0-9]*" id="pin-enter">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="messages"></div>
+
+	<div class="page-header">
+		<h1>Examples</h1>
+	</div>
+	<h2>Touch</h2>
+	<h2>Geolocation</h2>
+	<h2>Device Orientation</h2>
+	<h2>Device Motion</h2>
+
+		{{ content }}
+
+	</div>
+<!-- 
+<script data-main="/js/main" src="/js/require.js"></script>
+
+<script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
+<script type="text/javascript">var _gaq = [['_setAccount', 'UA-35774866-1'],['_trackPageview'],['_setDomainName', 'benjaminbenben.com']];(function(c,d,a){var b=c.createElement(a);b.type="text/java"+a;b.async=!0;b.src=d+(d+"s:"==c.location.protocol?"s://ssl":"://www")+".google-analytics.com/ga.js";a=c.getElementsByTagName(a)[0];a.parentNode.insertBefore(b,a)})(document,"http","script");
+</script>
+ -->
+
+<script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
+<!-- <script src="peer.js"></script> -->
+<script src="http://pinjs.herokuapp.com/pin.js"></script>
+<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+(function(){
+
+	if(typeof(Peer) === 'undefined'){
+		return fail('unable to load peerjs on this browser');
+	}
+
+	var peer = new Peer({key: '931o5syxyhzrggb9'});
+	var pin = new Pin(peer, 'http://pinjs.herokuapp.com/');
+
+
+	peer.on('error', fail);
+
+	// zeroTimeout doesn't seem to be working for error emits
+	if(!util.supports.audioVideo && !util.supports.data){
+		return fail('browser does not support webRTC');	
+	}
+
+	$('#action .disabled').removeClass('disabled');
+
+	// create modal shown
+	$('#create').on('show.bs.modal', function () {
+		$('#pin-code').text('...');
+		pin.generate(function(pin){
+			$('#pin-code').text(pin.join(''));
+		})
+	})
+	$('#enter').on('show.bs.modal', function () {
+		$('#pin-enter').val('')
+	})
+	$('#pin-enter').on('keyup',function(){
+		if($('#pin-enter').val().length > 3){
+			pin.use($('#pin-enter').val());
+			$('#pin-enter').replaceWith('<h1>joining...</h1>')
+		}
+	})
+
+
+	pin.on('ready', function(){
+		$('.modal').modal('hide');
+		$('<div>',{'class':'alert alert-success',text:'Connected!'}).appendTo('#messages')
+	})
+
+	function fail(message){
+		$('#action').addClass('alert alert-danger').text(message)
+	}
+})();
+
+</script>
+
+
+</body>
+</html>
