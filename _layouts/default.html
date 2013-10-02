@@ -74,12 +74,19 @@
 
 turnserversDotComAPI.iceServers(function(servers){
 
+	var servers = [
+        {url: "stun:23.21.150.121"},
+        {url: "stun:stun.l.google.com:19302"},
+        {url: "turn:numb.viagenie.ca", credential: "webrtcdemo", username: "louis%40mozilla.com"}
+  ]
+
 	if(typeof(Peer) === 'undefined'){
 		return fail('unable to load peerjs on this browser');
 	}
 
 
-	var peer = new Peer({key: '931o5syxyhzrggb9', config:{iceServers: servers}});
+	var peer = new Peer({key: '931o5syxyhzrggb9', config:{iceServers: servers}, debug: 3});
+
 	var pin = new Pin(peer, 'http://pinjs.herokuapp.com/');
 
 
